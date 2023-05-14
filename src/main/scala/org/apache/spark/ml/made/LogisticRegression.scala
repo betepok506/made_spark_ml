@@ -36,14 +36,10 @@ trait LogisticRegressionParams extends HasLabelCol
   with HasElasticNetParam {
 
   def setLabelCol(value: String): this.type = set(labelCol, value)
-
-  //  def setElasticNetParam(value: Int): this.type = set(elasticNetParam, value)
   def setPredictionCol(value: String): this.type = set(predictionCol, value)
 
   def setFeaturesCol(value: String): this.type = set(featuresCol, value)
-
-
-  //  setDefault(maxIter -> 500, stepSize -> 0.01, elasticNetParam -> 0.8)
+  
   setDefault(maxIter -> 500, stepSize -> 0.01)
 
   protected def validateAndTransformSchema(schema: StructType): StructType = {
