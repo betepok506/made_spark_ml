@@ -39,7 +39,7 @@ trait LogisticRegressionParams extends HasLabelCol
   def setPredictionCol(value: String): this.type = set(predictionCol, value)
 
   def setFeaturesCol(value: String): this.type = set(featuresCol, value)
-  
+
   setDefault(maxIter -> 500, stepSize -> 0.01)
 
   protected def validateAndTransformSchema(schema: StructType): StructType = {
