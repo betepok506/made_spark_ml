@@ -45,7 +45,7 @@ class LogisticRegressionTest extends AnyFlatSpec with should.Matchers with WithS
       .setLabelCol("label")
       .setPredictionCol("prediction")
       .setMaxIter(100)
-      .setStepSize(1.0)
+      .setRegParam(0.001)
 
     val model = estimator.fit(data)
 
@@ -70,7 +70,7 @@ class LogisticRegressionTest extends AnyFlatSpec with should.Matchers with WithS
         .setLabelCol("label")
         .setPredictionCol("prediction")
         .setMaxIter(100)
-        .setStepSize(1.0)
+        .setRegParam(0.001)
     ))
 
     val tmpFolder = Files.createTempDir()
@@ -89,7 +89,7 @@ class LogisticRegressionTest extends AnyFlatSpec with should.Matchers with WithS
         .setLabelCol("label")
         .setPredictionCol("prediction")
         .setMaxIter(100)
-        .setStepSize(1.0)
+        .setRegParam(0.001)
     ))
 
     val model = pipeline.fit(data)

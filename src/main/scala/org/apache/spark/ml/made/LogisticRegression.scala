@@ -8,7 +8,7 @@ import org.apache.spark.ml.linalg.{DenseVector, Vector, VectorUDT, Vectors}
 import org.apache.spark.ml.param.{BooleanParam, Param, ParamMap}
 import org.apache.spark.ml.param.shared.{
   HasElasticNetParam, HasFeaturesCol, HasInputCol,
-  HasLabelCol, HasMaxIter, HasOutputCol, HasPredictionCol, HasStepSize
+  HasLabelCol, HasMaxIter, HasOutputCol, HasPredictionCol, HasStepSize, HasRegParam
 }
 import org.apache.spark.ml.stat.Summarizer
 import org.apache.spark.ml.util._
@@ -32,7 +32,7 @@ trait LogisticRegressionParams extends HasLabelCol
   with HasFeaturesCol
   with HasPredictionCol
   with HasMaxIter
-  with HasStepSize
+  with HasRegParam
   with HasElasticNetParam {
 
   def setLabelCol(value: String): this.type = set(labelCol, value)
@@ -40,7 +40,7 @@ trait LogisticRegressionParams extends HasLabelCol
 
   def setFeaturesCol(value: String): this.type = set(featuresCol, value)
 
-  setDefault(maxIter -> 500, stepSize -> 0.01)
+  setDefault(maxIter -> 500, regParam -> 0.001)
 
   protected def validateAndTransformSchema(schema: StructType): StructType = {
     SchemaUtils.checkColumnType(schema, getFeaturesCol, new VectorUDT())
@@ -62,7 +62,7 @@ class LogisticRegression(override val uid: String) extends Estimator[LogisticReg
 
   def setMaxIter(value: Int): this.type = set(maxIter, value)
 
-  def setStepSize(value: Double): this.type = set(stepSize, value)
+  def setRegParam(value: Double): this.type = set(regParam, value)
 
 
   override def fit(dataset: Dataset[_]): LogisticRegressionModel = {
@@ -71,7 +71,6 @@ class LogisticRegression(override val uid: String) extends Estimator[LogisticReg
 
     var theta = Vectors.dense(Array.fill(numFeatures + 1)(0.0))
     for (i <- 1 until $(maxIter)) {
-      println(i)
       val grad = assembledData.rdd.map { row =>
         val label = row.getDouble(1)
         val features = row.getAs[Vector](0)
@@ -85,7 +84,7 @@ class LogisticRegression(override val uid: String) extends Estimator[LogisticReg
 
       ).asBreeze.toDenseVector)
 
-      theta = Vectors.dense(theta.toArray.zip(grad.toArray).map { case (x, y) => x - $(stepSize) * y })
+      theta = Vectors.dense(theta.toArray.zip(grad.toArray).map { case (x, y) => x - $(regParam) * y })
     }
 
     copyValues(new LogisticRegressionModel(theta.toDense))
